@@ -4,27 +4,16 @@ from PIL import Image
 from tqdm import tqdm
 import os
 import kagglehub
+import shutil
 
 # Download and load the dataset
 print("Downloading dataset...")
 dataset_path = kagglehub.dataset_download("msambare/fer2013")
 
-# Define CSV path
-csv_path = os.path.join(dataset_path, "fer2013.csv")
-if not os.path.exists(csv_path):
-    raise FileNotFoundError(f"Dataset not found at {csv_path}")
-
-# Load the dataset
-print("Loading dataset...")
-df = pd.read_csv(csv_path)
-
-# Function to convert string to integer
-def atoi(s):
-    return int(s)
 
 # Define folder structure
 outer_names = ['test', 'train']
-inner_names = ['angry', 'disgusted', 'fearful', 'happy', 'sad', 'surprised', 'neutral']
+inner_names = ['angry', 'disgust', 'fear', 'happy', 'sad', 'surprise', 'neutral']
 
 # Create folders for data storage
 print("Creating directories...")
@@ -37,21 +26,29 @@ for outer_name in outer_names:
 counts = { 'train': {name: 0 for name in inner_names}, 'test': {name: 0 for name in inner_names} }
 
 # Prepare images
-print("Processing and saving images...")
-mat = np.zeros((48, 48), dtype=np.uint8)
-for i in tqdm(range(len(df))):
-    pixels = df['pixels'][i].split()
-    emotion = df['emotion'][i]
-    mode = 'train' if i < 28709 else 'test'
-    
-    # Convert pixels to a 48x48 image
-    for j in range(2304):
-        mat[j // 48][j % 48] = atoi(pixels[j])
-    
-    img = Image.fromarray(mat)
-    emotion_label = inner_names[emotion]
-    img_path = os.path.join('data', mode, emotion_label, f"im{counts[mode][emotion_label]}.png")
-    img.save(img_path)
-    counts[mode][emotion_label] += 1
+def copy_images(src_folder, dest_folder):
+    for inner_name in inner_names:
+        src_path = os.path.join(src_folder, inner_name)
+        dest_path = os.path.join(dest_folder, inner_name)
 
-print("Dataset preparation complete! Images are saved in the 'data/' directory.")
+        if not os.path.exists(src_path):
+            print(f" Warning: {src_path} not found. Skipping...")
+            continue
+
+        # Copy images from source to destination
+        for img_name in tqdm(os.listdir(src_path), desc=f"Processing {inner_name}"):
+            src_img_path = os.path.join(src_path, img_name)
+            dest_img_path = os.path.join(dest_path, img_name)
+            shutil.copy(src_img_path, dest_img_path)
+
+# Copy training images
+print("\nCopying training images...")
+train_path = os.path.join(dataset_path, "train")
+copy_images(train_path, 'data/train')
+
+# Copy testing images
+print("\nCopying testing images...")
+test_path = os.path.join(dataset_path, "test")
+copy_images(test_path, 'data/test')
+
+print("\n Dataset preparation complete! Images are saved in the 'data/' directory.")
