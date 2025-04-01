@@ -8,17 +8,20 @@ import random  # For generating dummy emotions in the mock API
 st.markdown("""
     <style>
     /* Background */
-    .stApp { background-color: #1e1e2e; color: #ffffff; }
+    html, body, [data-testid="stAppViewContainer"] {
+       background-color: #1e1e2e;
+       color: #ffffff;
+    }
     
     /* Sidebar */
-    [data-testid="stSidebar"] { background-color: #252532; color: white; }
+     [data-testid="stSidebar"] { background-color: #252532; color: white; }
     
     /* Titles */
     .title { text-align: center; font-size: 40px; font-weight: bold; color: #4CAF50; }
     .subheader { text-align: center; font-size: 20px; color: #c7c7c7; }
 
     /* File Upload & Webcam Section */
-    .stFileUploader, .stCamera {
+    [data-testid="stFileUploader"], [data-testid="stCameraInput"]{
         border: 2px solid #4CAF50;
         padding: 15px;
         border-radius: 10px;
@@ -26,22 +29,33 @@ st.markdown("""
         background-color: #2e2e3e;
         color: white;
     }
-    
-    /* Button Styling */ 
-    .stButton>button {
-        background-color: #4CAF50;
-        color: white;
-        font-size: 18px;
-        border-radius: 8px;
-        padding: 10px 20px;
-        margin-top: 10px;
-        transition: 0.3s;
-        border: none;
+        /* Ensure radio button labels are visible */
+    [data-testid="stRadio"] label {
+        color: white !important;  
+        font-size: 18px;  
+        //opacity: 1 !important; 
+        font-weight: bold;  
+        filter: brightness(2.5); 
     }
-    .stButton>button:hover { background-color: #45a049; transform: scale(1.05); }
+    button {
+        background-color: #4CAF50 !important;
+        color: white !important;
+        font-size: 18px !important;
+        border-radius: 8px !important;
+        padding: 10px 20px !important;
+        margin-top: 10px !important;
+        transition: 0.3s !important;
+        border: none !important;
+        opacity: 1 !important;
+        display: block !important;
+    }
+    button:hover { 
+        background-color: #45a049 !important; 
+        transform: scale(1.05) !important; 
+    }
 
-    /* Image Styling */
-    .stImage img {
+    "    /* Image Styling */
+    [data-testid="stImage"] img {
         border-radius: 10px;
         box-shadow: 0px 4px 8px rgba(0, 255, 0, 0.3);
         margin-top: 20px;
